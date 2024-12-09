@@ -1,5 +1,5 @@
 from app import db
-from models import Sensor
+from app.models import Sensor
 
 class SensorService:
     @staticmethod

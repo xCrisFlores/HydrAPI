@@ -1,5 +1,5 @@
 from app import db
-from models import RealTimeCon
+from app.models import RealTimeCon
 
 class ConsumptionService:
     @staticmethod
