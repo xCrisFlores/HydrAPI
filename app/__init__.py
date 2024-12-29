@@ -12,11 +12,10 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    # Importar y registrar rutas después de inicializar la app
     from app.routes import register_routes
     register_routes(app)
 
     with app.app_context():
-        db.create_all()  # Crear tablas si no existen
+        db.create_all()  
 
     return app

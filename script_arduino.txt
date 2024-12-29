@@ -1,0 +1,93 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include <ArduinoJson.h>
+
+// Configuración de red WiFi
+const char* ssid = "SSID";         // Reemplaza con el nombre de tu red WiFi
+const char* password = "PASSWORD";        // Reemplaza con la contraseña de tu red
+
+// URL de la API Flask
+const char* serverUrl = "http://IP:5000/api/consumption"; // Reemplaza con la URL de tu servidor Flask
+
+// Configuración del sensor
+const int sensorPin = 2; // Pin donde está conectado el sensor de flujo
+int fakeFlowRate = 0;    // Variable para almacenar el flujo simulado
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(sensorPin, OUTPUT);
+
+  // Conectar a WiFi
+  Serial.println("Intentando conectar a WiFi...");
+  WiFi.begin(ssid, password);
+
+  int retryCount = 0;
+  while (WiFi.status() != WL_CONNECTED && retryCount < 20) {
+    delay(500);
+    Serial.print(".");
+    retryCount++;
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\nConexión exitosa a WiFi.");
+    Serial.print("Dirección IP: ");
+    Serial.println(WiFi.localIP());
+  } else {
+    Serial.println("\nFallo al conectar a WiFi. Verifica el SSID y la contraseña.");
+  }
+}
+
+void loop() {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    WiFiClient client;
+
+    // URL del servidor Flask
+    http.begin(client, serverUrl);
+    http.addHeader("Content-Type", "application/json");
+
+    // Crear el objeto JSON
+    StaticJsonDocument<200> doc;
+    doc["user_id"] = 1;
+    doc["sensor_id"] = 4;
+    doc["consumption"] = random(10, 100) / 10.0;  // Simula un consumo entre 1.0 y 10.0
+    doc["time_active"] = random(1, 60);           // Tiempo activo simulado entre 1 y 60 segundos
+
+    // Obtener el datetime actual
+    time_t now = time(nullptr);
+    struct tm* timeinfo = localtime(&now);
+    char currentTime[25];
+    strftime(currentTime, sizeof(currentTime), "%Y-%m-%dT%H:%M:%S", timeinfo);
+    doc["date"] = currentTime;
+
+    // Convertir el objeto JSON a un string
+    String jsonData;
+    serializeJson(doc, jsonData);
+
+    // Imprimir el JSON en la consola
+    Serial.println("Enviando datos:");
+    Serial.println(jsonData);
+
+    // Enviar la solicitud POST
+    int httpResponseCode = http.POST(jsonData);
+
+    if (httpResponseCode > 0) {
+      Serial.print("Código de respuesta del servidor: ");
+      Serial.println(httpResponseCode);
+      String response = http.getString();
+      Serial.println("Respuesta del servidor: ");
+      Serial.println(response);
+    } else {
+      Serial.print("Error al enviar la solicitud: ");
+      Serial.println(http.errorToString(httpResponseCode));
+    }
+
+    http.end();
+
+    delay(5000); // Esperar 5 segundos antes del próximo envío
+  } else {
+    Serial.println("Desconectado de WiFi. Reconectando...");
+    WiFi.begin(ssid, password);
+    delay(5000); // Intentar reconectar cada 5 segundos
+  }
+}
