@@ -1,0 +1,8 @@
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Script
+pyodbc
+flask_socketio
+flask_sock
+flask-cors

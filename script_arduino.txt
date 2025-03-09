@@ -1,0 +1,73 @@
+#include <ArduinoWebsockets.h>
+#include <ESP8266WiFi.h>
+#include <ArduinoJson.h>
+
+using namespace websockets;
+
+//modificar estas variables para hacer pruebas locales
+
+//Llenar con las credenciales de tu red
+const char* ssid = "SSID"; 
+const char* password = "contraseña"; 
+
+//Agregar los Ids correspondientes a estos datos:
+
+const int sensor_id = 0;
+const int user_id = 0;
+
+//Cambia la palabra IP por la direccion IP de tu pc donde esta el servidor flask (como recomendacion, usa ip estatica en lugar de DHCP)
+const char* websocket_server = "ws://IP:5000/ws";
+
+WebsocketsClient client;
+
+void setup() {
+  Serial.begin(9600);
+  WiFi.begin(ssid, password);
+
+  Serial.print("Conectando a WiFi...");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nConectado a WiFi.");
+
+  if (client.connect(websocket_server)) {
+    Serial.println("Conexión exitosa al servidor WebSocket.");
+  } else {
+    Serial.println("Fallo al conectar al servidor WebSocket.");
+    while (true) { 
+      delay(1000);
+    }
+  }
+}
+
+void loop() {
+  if (client.available()) {
+    StaticJsonDocument<200> doc;
+    doc["user_id"] = user_id;
+    doc["sensor_id"] = sensor_id;
+    doc["consumption"] = random(10, 100) / 100.0;
+    doc["time_active"] = 1;
+
+    String jsonData;
+    serializeJson(doc, jsonData);
+
+    // Enviar los datos al servidor WebSocket
+    client.send(jsonData);
+    Serial.println("Datos enviados al servidor: " + jsonData);
+
+    // Mantener la conexión WebSocket activa
+    client.poll();
+    
+    delay(1000); 
+  } else {
+    // Reconectar si la conexión se ha perdido
+    Serial.println("Conexión perdida, reconectando...");
+    if (client.connect(websocket_server)) {
+      Serial.println("Reconexión exitosa al servidor WebSocket.");
+    } else {
+      Serial.println("Fallo al reconectar al servidor WebSocket.");
+      delay(5000); // Intentar reconectar después de 5 segundos
+    }
+  }
+}
