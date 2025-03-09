@@ -32,6 +32,6 @@ Lo que iniciara el servicio de la API, es necesario que ademas consultes la docu
 * [HydrAI](https://github.com/xCrisFlores/HydrAI) (Aplicacion movil para visualizar los datos generados por el sensor)
 
 ## Puntos importantes
-* Si vas a colaborar en este repositorio, el proyecto suele generar carpetas de cache, antes de subir tus cambios elimina estas carpetas y regresa la linea de codigo de la cadena de conexioncomo estaba antes, esto para evitar conflictos entre versiones, o siempre puedes crear una nueva branch para subir tus cambios
-* Antes de iniciar las pruebas es necesario que hagas un registro en la tabla de usuarios, y otro en la de sensores
-* Este proyecto incluye un archivo llamado script_arduino.txt este archivo es el archivo de configuracion para el ESP8266 deberas modificar algunos parametros como el id del usuario y sensor que acabaste de generar, para que este pueda compilar correctamente en el circuito y ademas funcione correctamente entre todo el flujo de servicios
+* Si vas a colaborar en este repositorio, el proyecto suele generar carpetas de cache, antes de subir tus cambios elimina estas carpetas y regresa la linea de codigo de la cadena de conexioncomo estaba antes, esto para evitar conflictos entre versiones, o siempre puedes crear una nueva branch para subir tus cambios.
+* Antes de iniciar las pruebas es necesario que hagas un registro en la tabla de usuarios, y otro en la de sensores.
+* Este proyecto incluye un archivo llamado script_arduino.txt este archivo es el archivo de configuracion para el ESP8266 deberas modificar algunos parametros como el id del usuario y sensor que acabaste de generar, para que este pueda compilar correctamente en el circuito y ademas funcione correctamente entre todo el flujo de servicios.
